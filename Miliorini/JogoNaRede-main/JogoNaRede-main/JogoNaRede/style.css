@@ -1,0 +1,397 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a2e1c 0%, #05140a 100%);
+    min-height: 100vh;
+    color: white;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    font-size: 2.5em;
+    background: linear-gradient(135deg, gold, #ff6b00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nav-tab {
+    background: rgba(0,0,0,0.6);
+    padding: 12px 25px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.nav-tab:hover {
+    background: rgba(255,215,0,0.3);
+    transform: translateY(-2px);
+}
+
+.nav-tab.active {
+    background: linear-gradient(135deg, gold, #ff6b00);
+    color: #000;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.league-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.league-card {
+    background: rgba(0,0,0,0.7);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.league-card:hover {
+    transform: translateY(-5px);
+}
+
+.league-card.selected {
+    border-color: gold;
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(0,0,0,0.8));
+}
+
+.league-icon {
+    font-size: 2.5em;
+}
+
+.league-name {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.teams-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.team-container {
+    background: rgba(0,0,0,0.7);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid gold;
+}
+
+.team-select {
+    width: 100%;
+    padding: 12px;
+    background: #1a1a1a;
+    border: 2px solid gold;
+    border-radius: 10px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.formation-select {
+    width: 100%;
+    padding: 10px;
+    background: #1a1a1a;
+    border: 1px solid gold;
+    border-radius: 8px;
+    color: white;
+    margin: 15px 0;
+    cursor: pointer;
+}
+
+.field {
+    background: linear-gradient(135deg, #2d5a2c 0%, #1a3a19 100%);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 15px 0;
+    position: relative;
+    min-height: 450px;
+    border: 3px solid white;
+}
+
+.field::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: white;
+    transform: translateY(-50%);
+}
+
+.field::after {
+    content: "⚽";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    opacity: 0.3;
+}
+
+.positions-container {
+    position: relative;
+    min-height: 400px;
+}
+
+.player-on-field {
+    position: absolute;
+    background: rgba(0,0,0,0.85);
+    border: 2px solid gold;
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.7em;
+    text-align: center;
+    transform: translateX(-50%);
+}
+
+.player-on-field:hover {
+    transform: translateX(-50%) scale(1.1);
+    background: gold;
+    color: black;
+}
+
+.player-number {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.player-name-field {
+    font-size: 0.6em;
+}
+
+.player-rating {
+    font-size: 0.6em;
+    color: gold;
+}
+
+.players-section {
+    margin-top: 20px;
+}
+
+.players-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: gold;
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.player-card {
+    background: rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.player-card:hover {
+    background: rgba(255,215,0,0.3);
+    transform: scale(1.02);
+}
+
+.player-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.player-pos {
+    background: rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7em;
+}
+
+.edit-btn {
+    background: #4CAF50;
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.7em;
+}
+
+.simulate-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+    background: linear-gradient(135deg, gold, #ff6b00);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin: 20px 0;
+}
+
+.simulate-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    background: rgba(0,0,0,0.8);
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 20px;
+    animation: fadeIn 0.5s;
+}
+
+.score {
+    font-size: 4em;
+    text-align: center;
+    font-weight: bold;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid gold;
+}
+
+.modal input, .modal select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background: #2d2d2d;
+    border: 1px solid gold;
+    border-radius: 5px;
+    color: white;
+}
+
+.tabela {
+    background: rgba(0,0,0,0.7);
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+th {
+    background: gold;
+    color: black;
+}
+
+.stat {
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 8px;
+    display: inline-block;
+    margin: 5px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .teams-panel {
+        grid-template-columns: 1fr;
+    }
+    .player-on-field {
+        width: 45px;
+        height: 45px;
+        font-size: 0.5em;
+    }
+    .score {
+        font-size: 2.5em;
+    }
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Calculadora de IMC</title>
+
+    <style>
+        /* Centraliza todo o conteúdo do corpo da página e muda a fonte do texto */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 50px; 
+            text-align: center; 
+            background-color: #f4f4f4;
+        }
+        /* Estiliza os campos de entrada (inputs) e o botão para ficarem maiores e espaçados */
+        input, button { 
+            padding: 10px; 
+            margin: 10px; 
+            font-size: 16px; 
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        /* Dá um destaque visual verde para o botão de clique */
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        /* Destaca o texto onde o resultado será exibido */
+        #resultado {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calculadora de IMC</h1>
+
+    <input type="number" id="peso" placeholder="Peso em kg (ex: 70.5)" step="0.1">
+    
+    <br>
+    
+    <input type="number" id="altura" placeholder="Altura em metros (ex: 1.75)" step="0.01">
+    
+    <br>
+    
+    <button onclick="calcularIMC()">Calcular IMC</button>
+
+    <p id="resultado"></p>
+
+    <script>
+        // Define a função que será executada quando o botão for clicado
+        function calcularIMC() {
+            
+            // Busca o input do peso pelo ID, pega o valor digitado (.value) e converte em número decimal (parseFloat)
+            let peso = parseFloat(document.getElementById('peso').value);
+            
+            // Faz o mesmo processo da linha anterior para capturar a altura digitada
+            let altura = parseFloat(document.getElementById('altura').value);
+
+            // Validação: Verifica se o peso ou a altura não são números (isNaN) ou se são menores/iguais a zero
+            if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) {
+                // Se os dados estiverem errados, exibe uma mensagem de erro no parágrafo de resultado
+                document.getElementById('resultado').innerText = "Por favor, insira valores válidos!";
+                // O 'return' interrompe a função aqui para o código não tentar fazer a conta com erro
+                return; 
+            }
+
+            // Realiza o cálculo matemático do IMC: peso dividido por (altura vezes altura)
+            let imc = peso / (altura * altura);
+            
+            // Cria uma variável de texto (String) vazia para guardar a classificação do peso depois
+            let classificacao = "";
+
+            // Estrutura de condição em JavaScript para avaliar as faixas do IMC
+            if (imc < 18.5) {
+                classificacao = "Abaixo do peso";
+            } 
+            // '&&' significa 'E' (as duas condições precisam ser verdadeiras ao mesmo tempo)
+            else if (imc >= 18.5 && imc < 25) {
+                classificacao = "Peso normal (ideal)";
+            } 
+            else if (imc >= 25 && imc < 30) {
+                classificacao = "Sobrepeso";
+            } 
+            else if (imc >= 30 && imc < 35) {
+                classificacao = "Obesidade Grau I";
+            } 
+            else if (imc >= 35 && imc < 40) {
+                classificacao = "Obesidade Grau II";
+            } 
+            // Caso nenhuma das condições de cima seja atendida, o IMC só pode ser 40 ou mais
+            else {
+                classificacao = "Obesidade Grau III (Mórbida)";
+            }
+
+            // Injeta o resultado final dentro do parágrafo HTML que tem o ID 'resultado'
+            // '.toFixed(2)' limita o número do IMC para mostrar apenas 2 casas decimais
+            document.getElementById('resultado').innerText = `Seu IMC é: ${imc.toFixed(2)} (${classificacao})`;
+        }
+    </script>
+</body>
+</html>

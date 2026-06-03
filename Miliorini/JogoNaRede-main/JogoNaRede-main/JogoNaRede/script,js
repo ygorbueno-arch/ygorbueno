@@ -1,0 +1,278 @@
+// ==================== BANCO DE DADOS EM MEMÓRIA ====================
+let dbTimes = {};
+let ligaAtual = "premier";
+let timeSelecionado1 = "", timeSelecionado2 = "";
+let currentEditTeamId = null;
+let currentEditPlayer = null;
+let campeonato = {};
+
+// ==================== INICIALIZAÇÃO ====================
+function initDB() {
+    for (const [ligaKey, liga] of Object.entries(LIGAS)) {
+        for (const time of liga.times) {
+            if (!dbTimes[time.nome]) {
+                dbTimes[time.nome] = {
+                    ...time,
+                    liga: ligaKey,
+                    jogadores: gerarElencoUnico(time.nome, time.forca)
+                };
+            }
+        }
+    }
+}
+
+function carregarLigas() {
+    const grid = document.getElementById('leagueGrid');
+    grid.innerHTML = "";
+    for (const [key, liga] of Object.entries(LIGAS)) {
+        const card = document.createElement('div');
+        card.className = `league-card ${key === ligaAtual ? 'selected' : ''}`;
+        card.onclick = () => trocarLiga(key);
+        card.innerHTML = `<div class="league-icon">${liga.icone}</div><div class="league-name">${liga.nome}</div>`;
+        grid.appendChild(card);
+    }
+}
+
+function trocarLiga(ligaKey) {
+    ligaAtual = ligaKey;
+    carregarLigas();
+    carregarSelectTimes();
+    carregarTimeCompleto(1);
+    carregarTimeCompleto(2);
+    initCampeonato();
+}
+
+function carregarSelectTimes() {
+    const times = LIGAS[ligaAtual].times;
+    const select1 = document.getElementById('team1Select');
+    const select2 = document.getElementById('team2Select');
+    select1.innerHTML = "";
+    select2.innerHTML = "";
+    times.forEach(time => {
+        const opt1 = document.createElement('option');
+        const opt2 = document.createElement('option');
+        opt1.value = time.nome;
+        opt1.textContent = `${time.nome} (${time.forca}) ⭐`;
+        opt2.value = time.nome;
+        opt2.textContent = `${time.nome} (${time.forca}) ⭐`;
+        select1.appendChild(opt1);
+        select2.appendChild(opt2);
+    });
+    if (times[0]) timeSelecionado1 = times[0].nome;
+    if (times[1]) timeSelecionado2 = times[1].nome;
+    select1.value = timeSelecionado1;
+    select2.value = timeSelecionado2;
+}
+
+function carregarTimeCompleto(teamId) {
+    const select = document.getElementById(`team${teamId}Select`);
+    const timeNome = select.value;
+    if (teamId === 1) timeSelecionado1 = timeNome;
+    else timeSelecionado2 = timeNome;
+    const time = dbTimes[timeNome];
+    if (!time) return;
+    atualizarCampo(teamId);
+    atualizarElenco(teamId);
+    atualizarInfoSimulador();
+}
+
+function atualizarCampo(teamId) {
+    const timeNome = teamId === 1 ? timeSelecionado1 : timeSelecionado2;
+    const time = dbTimes[timeNome];
+    const formacao = document.getElementById(`formacao${teamId}`).value;
+    const container = document.getElementById(`field${teamId}`);
+    container.innerHTML = "";
+    const config = POSICOES_CAMPO[formacao];
+    if (!config) return;
+    const jogadoresPorPos = {};
+    time.jogadores.forEach(j => {
+        if (!jogadoresPorPos[j.posicao]) jogadoresPorPos[j.posicao] = [];
+        jogadoresPorPos[j.posicao].push(j);
+    });
+    for (const [posicao, posicoes] of Object.entries(config)) {
+        const jogadores = jogadoresPorPos[posicao] || [];
+        for (let i = 0; i < Math.min(jogadores.length, posicoes.length); i++) {
+            const jogador = jogadores[i];
+            const pos = posicoes[i];
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player-on-field';
+            playerDiv.style.top = pos.top;
+            playerDiv.style.left = pos.left;
+            playerDiv.onclick = () => abrirModal(teamId, jogador);
+            playerDiv.innerHTML = `<div class="player-number">${jogador.numero}</div><div class="player-name-field">${jogador.nome.split(' ')[0]}</div><div class="player-rating">${jogador.overall}</div>`;
+            container.appendChild(playerDiv);
+        }
+    }
+}
+
+function atualizarElenco(teamId) {
+    const timeNome = teamId === 1 ? timeSelecionado1 : timeSelecionado2;
+    const time = dbTimes[timeNome];
+    const container = document.getElementById(`elenco${teamId}`);
+    container.innerHTML = "";
+    time.jogadores.forEach(jogador => {
+        const card = document.createElement('div');
+        card.className = 'player-card';
+        card.onclick = () => abrirModal(teamId, jogador);
+        card.innerHTML = `<div class="player-info"><span class="player-number">#${jogador.numero}</span><strong>${jogador.nome}</strong><span class="player-pos">${jogador.posicao}</span><span>⭐${jogador.overall}</span></div><button class="edit-btn">✏️</button>`;
+        container.appendChild(card);
+    });
+}
+
+function atualizarFormacao(teamId) {
+    atualizarCampo(teamId);
+}
+
+function atualizarInfoSimulador() {
+    const time1 = dbTimes[timeSelecionado1];
+    const time2 = dbTimes[timeSelecionado2];
+    document.getElementById('simTime1Nome').innerHTML = `🏠 ${timeSelecionado1}`;
+    document.getElementById('simTime2Nome').innerHTML = `✈️ ${timeSelecionado2}`;
+    if (time1) document.getElementById('simTime1Info').innerHTML = `<div class="stat">⚡ Força: ${time1.forca} | 🏟️ ${time1.estadio} | 👨‍🏫 ${time1.tecnico}</div>`;
+    if (time2) document.getElementById('simTime2Info').innerHTML = `<div class="stat">⚡ Força: ${time2.forca} | 🏟️ ${time2.estadio} | 👨‍🏫 ${time2.tecnico}</div>`;
+}
+
+function abrirModal(teamId, player) {
+    currentEditTeamId = teamId;
+    currentEditPlayer = player;
+    document.getElementById('editNome').value = player.nome;
+    document.getElementById('editPosicao').value = player.posicao;
+    document.getElementById('editOverall').value = player.overall;
+    document.getElementById('editNumero').value = player.numero;
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function salvarEdicao() {
+    if (currentEditPlayer) {
+        currentEditPlayer.nome = document.getElementById('editNome').value;
+        currentEditPlayer.posicao = document.getElementById('editPosicao').value;
+        currentEditPlayer.overall = parseInt(document.getElementById('editOverall').value);
+        currentEditPlayer.numero = parseInt(document.getElementById('editNumero').value);
+        atualizarCampo(currentEditTeamId);
+        atualizarElenco(currentEditTeamId);
+        fecharModal();
+    }
+}
+
+function fecharModal() {
+    document.getElementById('editModal').style.display = 'none';
+    currentEditPlayer = null;
+}
+
+function simularPartida() {
+    if (timeSelecionado1 === timeSelecionado2) {
+        alert("⚠️ Selecione times diferentes para simular!");
+        return;
+    }
+    const time1 = dbTimes[timeSelecionado1];
+    const time2 = dbTimes[timeSelecionado2];
+    const forca1 = time1.forca + (Math.random() * 8 - 4);
+    const forca2 = time2.forca + (Math.random() * 8 - 4);
+    let gols1 = 0, gols2 = 0;
+    const eventos = [];
+    for (let i = 0; i < 90; i += 10) {
+        if (Math.random() < (forca1 / 100) * 0.4) {
+            gols1++;
+            eventos.push(`⚽ GOL! ${timeSelecionado1} aos ${i+Math.floor(Math.random()*10)}'`);
+        }
+        if (Math.random() < (forca2 / 100) * 0.35) {
+            gols2++;
+            eventos.push(`⚽ GOL! ${timeSelecionado2} aos ${i+Math.floor(Math.random()*10)}'`);
+        }
+    }
+    const cartoes1 = Math.floor(Math.random() * 3);
+    const cartoes2 = Math.floor(Math.random() * 3);
+    if (cartoes1 > 0) eventos.push(`🟨 ${cartoes1} cartão(es) para ${timeSelecionado1}`);
+    if (cartoes2 > 0) eventos.push(`🟨 ${cartoes2} cartão(es) para ${timeSelecionado2}`);
+    const resultado = `<div style="text-align:center;"><div class="score">${gols1} : ${gols2}</div><div style="display:flex; justify-content:space-between; gap:20px; margin:20px 0;"><div style="flex:1; background:rgba(255,255,255,0.1); padding:15px; border-radius:15px;"><h3>${timeSelecionado1}</h3><p>⭐ Força: ${time1.forca}</p><p>🎯 Finalizações: ${Math.floor(Math.random()*15)+10}</p></div><div style="flex:1; background:rgba(255,255,255,0.1); padding:15px; border-radius:15px;"><h3>${timeSelecionado2}</h3><p>⭐ Força: ${time2.forca}</p><p>🎯 Finalizações: ${Math.floor(Math.random()*15)+10}</p></div></div><div style="max-height:200px; overflow-y:auto;">${eventos.map(e => `<div style="padding:5px;">${e}</div>`).join('')}</div><div style="margin-top:20px; font-size:1.5em;">${gols1 > gols2 ? `🏆 VENCEDOR: ${timeSelecionado1}! 🏆` : gols2 > gols1 ? `🏆 VENCEDOR: ${timeSelecionado2}! 🏆` : "🤝 EMPATE! 🤝"}</div></div>`;
+    document.getElementById('resultadoSim').innerHTML = resultado;
+    document.getElementById('resultadoSim').style.display = 'block';
+    registrarJogo(timeSelecionado1, timeSelecionado2, gols1, gols2);
+}
+
+function initCampeonato() {
+    const times = LIGAS[ligaAtual].times;
+    campeonato = {};
+    times.forEach(time => {
+        campeonato[time.nome] = { pontos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, jogos: 0 };
+    });
+    atualizarTabela();
+}
+
+function registrarJogo(time1, time2, gols1, gols2) {
+    if (!campeonato[time1]) campeonato[time1] = { pontos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, jogos: 0 };
+    if (!campeonato[time2]) campeonato[time2] = { pontos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, jogos: 0 };
+    campeonato[time1].golsPro += gols1;
+    campeonato[time1].golsContra += gols2;
+    campeonato[time2].golsPro += gols2;
+    campeonato[time2].golsContra += gols1;
+    campeonato[time1].jogos++;
+    campeonato[time2].jogos++;
+    if (gols1 > gols2) {
+        campeonato[time1].pontos += 3;
+        campeonato[time1].vitorias++;
+        campeonato[time2].derrotas++;
+    } else if (gols2 > gols1) {
+        campeonato[time2].pontos += 3;
+        campeonato[time2].vitorias++;
+        campeonato[time1].derrotas++;
+    } else {
+        campeonato[time1].pontos += 1;
+        campeonato[time2].pontos += 1;
+        campeonato[time1].empates++;
+        campeonato[time2].empates++;
+    }
+    atualizarTabela();
+}
+
+function atualizarTabela() {
+    const sorted = Object.entries(campeonato).sort((a,b) => {
+        if (a[1].pontos !== b[1].pontos) return b[1].pontos - a[1].pontos;
+        return (b[1].golsPro - b[1].golsContra) - (a[1].golsPro - a[1].golsContra);
+    });
+    let html = `<table><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead><tbody>`;
+    sorted.forEach(([time, s], idx) => {
+        const sg = s.golsPro - s.golsContra;
+        html += `<tr><td>${idx+1}</td><td><strong>${time}</strong></td><td>${s.pontos}</td><td>${s.jogos}</td><td>${s.vitorias}</td><td>${s.empates}</td><td>${s.derrotas}</td><td>${s.golsPro}</td><td>${s.golsContra}</td><td>${sg}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('tabelaCampeonato').innerHTML = html;
+}
+
+function simularCampeonato() {
+    initCampeonato();
+    const times = LIGAS[ligaAtual].times;
+    for (let i = 0; i < times.length; i++) {
+        for (let j = i+1; j < times.length; j++) {
+            const g1 = Math.floor(Math.random() * 5);
+            const g2 = Math.floor(Math.random() * 5);
+            registrarJogo(times[i].nome, times[j].nome, g1, g2);
+            const g3 = Math.floor(Math.random() * 5);
+            const g4 = Math.floor(Math.random() * 5);
+            registrarJogo(times[j].nome, times[i].nome, g3, g4);
+        }
+    }
+    alert(`🏆 ${LIGAS[ligaAtual].nome} finalizado! Confira a tabela! 🏆`);
+}
+
+function resetarCampeonato() {
+    initCampeonato();
+    alert("Campeonato resetado!");
+}
+
+function switchTab(tabId, event) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+}
+
+// ==================== INICIALIZAR TUDO ====================
+initDB();
+carregarLigas();
+carregarSelectTimes();
+carregarTimeCompleto(1);
+carregarTimeCompleto(2);
+initCampeonato();

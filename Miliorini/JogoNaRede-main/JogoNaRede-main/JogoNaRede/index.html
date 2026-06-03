@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ FIFA MANAGER - Elencos e Formações ⚽</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚽ FIFA MANAGER PRO - ELENCOS & FORMAÇÕES ⚽</h1>
+        <p>6 ligas | 30 times | 690 jogadores únicos | Formações táticas</p>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="switchTab('manager', event)">📋 GERENCIAR TIMES</div>
+        <div class="nav-tab" onclick="switchTab('simulator', event)">⚽ SIMULADOR</div>
+        <div class="nav-tab" onclick="switchTab('league', event)">🏆 CAMPEONATO</div>
+    </div>
+
+    <!-- Aba Gerenciar Times -->
+    <div id="manager" class="tab-content active">
+        <div class="league-grid" id="leagueGrid"></div>
+        
+        <div class="teams-panel">
+            <div class="team-container">
+                <div class="team-header">
+                    <span>🏠 TIME DA CASA</span>
+                    <select id="team1Select" class="team-select" onchange="carregarTimeCompleto(1)"></select>
+                </div>
+                <select id="formacao1" class="formation-select" onchange="atualizarFormacao(1)">
+                    <option value="4-4-2">📐 4-4-2 (Tradicional)</option>
+                    <option value="4-3-3">📐 4-3-3 (Ofensivo)</option>
+                    <option value="3-5-2">📐 3-5-2 (Meio-campo)</option>
+                    <option value="5-4-1">📐 5-4-1 (Defensivo)</option>
+                    <option value="4-2-3-1">📐 4-2-3-1 (Equilíbrio)</option>
+                </select>
+                <div class="field">
+                    <div class="positions-container" id="field1"></div>
+                </div>
+                <div class="players-section">
+                    <div class="players-title">📋 ELENCO COMPLETO (Clique para editar)</div>
+                    <div class="players-grid" id="elenco1"></div>
+                </div>
+            </div>
+
+            <div class="team-container">
+                <div class="team-header">
+                    <span>✈️ TIME VISITANTE</span>
+                    <select id="team2Select" class="team-select" onchange="carregarTimeCompleto(2)"></select>
+                </div>
+                <select id="formacao2" class="formation-select" onchange="atualizarFormacao(2)">
+                    <option value="4-4-2">📐 4-4-2 (Tradicional)</option>
+                    <option value="4-3-3">📐 4-3-3 (Ofensivo)</option>
+                    <option value="3-5-2">📐 3-5-2 (Meio-campo)</option>
+                    <option value="5-4-1">📐 5-4-1 (Defensivo)</option>
+                    <option value="4-2-3-1">📐 4-2-3-1 (Equilíbrio)</option>
+                </select>
+                <div class="field">
+                    <div class="positions-container" id="field2"></div>
+                </div>
+                <div class="players-section">
+                    <div class="players-title">📋 ELENCO COMPLETO (Clique para editar)</div>
+                    <div class="players-grid" id="elenco2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba Simulador -->
+    <div id="simulator" class="tab-content">
+        <div class="teams-panel">
+            <div class="team-container" style="text-align: center;">
+                <h2 id="simTime1Nome">Time da Casa</h2>
+                <div id="simTime1Info" style="margin-top: 10px;"></div>
+            </div>
+            <div class="team-container" style="text-align: center;">
+                <h2 id="simTime2Nome">Time Visitante</h2>
+                <div id="simTime2Info" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+        <button class="simulate-btn" onclick="simularPartida()">⚽ SIMULAR PARTIDA ⚽</button>
+        <div id="resultadoSim" class="result-area" style="display:none;"></div>
+    </div>
+
+    <!-- Aba Campeonato -->
+    <div id="league" class="tab-content">
+        <h2>🏆 TABELA DO CAMPEONATO</h2>
+        <div style="margin: 20px 0;">
+            <button class="simulate-btn" style="width: auto; padding: 10px 20px; display: inline-block; margin-right: 10px;" onclick="simularCampeonato()">🎮 Simular Campeonato</button>
+            <button class="simulate-btn" style="width: auto; padding: 10px 20px; display: inline-block; background: #4a4a4a;" onclick="resetarCampeonato()">🔄 Resetar</button>
+        </div>
+        <div class="tabela" id="tabelaCampeonato"></div>
+    </div>
+</div>
+
+<!-- Modal Edição -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ EDITAR JOGADOR</h3>
+        <input type="text" id="editNome" placeholder="Nome">
+        <select id="editPosicao">
+            <option value="GOL">Goleiro (GOL)</option>
+            <option value="ZAG">Zagueiro (ZAG)</option>
+            <option value="LAT">Lateral (LAT)</option>
+            <option value="VOL">Volante (VOL)</option>
+            <option value="MEI">Meia (MEI)</option>
+            <option value="ATA">Atacante (ATA)</option>
+        </select>
+        <input type="number" id="editOverall" min="50" max="99" placeholder="Overall (50-99)">
+        <input type="number" id="editNumero" min="1" max="99" placeholder="Número">
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="salvarEdicao()" style="flex:1; background:#4CAF50; padding:10px; border:none; border-radius:5px; color:white; cursor:pointer;">💾 SALVAR</button>
+            <button onclick="fecharModal()" style="flex:1; background:#f44336; padding:10px; border:none; border-radius:5px; color:white; cursor:pointer;">❌ CANCELAR</button>
+        </div>
+    </div>
+</div>
+
+<script src="dados.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+/* ==============================================================================
+   ARQUIVO: stylo.css (Estilização Moderna e Responsiva)
+   ============================================================================== */
+
+/* O seletor '*' aplica as regras abaixo para TODOS os elementos da página */
+* {
+    margin: 0;                   /* Remove as margens padrão do navegador */
+    padding: 0;                  /* Remove o espaçamento interno padrão */
+    box-sizing: border-box;      /* Garante que bordas e paddings não alterem o tamanho final dos elementos */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Define uma fonte mais moderna */
+}
+
+/* Estilização do fundo da página (corpo inteiro) */
+body {
+    display: flex;               /* Ativa o Flexbox para alinhar elementos facilmente */
+    justify-content: center;     /* Centraliza o conteúdo horizontalmente */
+    align-items: center;         /* Centraliza o conteúdo verticalmente */
+    min-height: 100vh;           /* Garante que o fundo ocupe no mínimo 100% da altura da tela */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Cria um degradê roxo/azul bem moderno */
+}
+
+/* Estilização do 'Card' (caixa branca onde fica a calculadora) */
+.container {
+    background-color: white;     /* Cor de fundo do card */
+    padding: 40px;               /* Espaço interno para o conteúdo não tocar nas bordas */
+    border-radius: 15px;         /* Arredonda os cantos do card */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Cria uma sombra suave para dar efeito de flutuação */
+    width: 100%;                 /* O card tenta ocupar toda a largura disponível... */
+    max-width: 400px;            /* ...mas limita o tamanho máximo em 400px para não esticar demais */
+    text-align: center;          /* Centraliza todos os textos e inputs dentro dele */
+}
+
+/* Estilização do título principal (H1) */
+h1 {
+    color: #333;                 /* Cor cinza escuro para o texto */
+    margin-bottom: 25px;         /* Espaço abaixo do título para afastar os inputs */
+    font-size: 28px;             /* Tamanho da fonte */
+}
+
+/* Estilização das caixas de entrada de texto/número (inputs) */
+input {
+    width: 100%;                 /* Faz o input ocupar toda a largura interna do card */
+    padding: 12px 15px;          /* Espaçamento interno para o texto digitado não ficar apertado */
+    margin-bottom: 20px;         /* Espaço abaixo de cada input */
+    border: 2px solid #e2e8f0;   /* Cria uma borda fina e cinza clara */
+    border-radius: 8px;          /* Arredonda os cantos do input */
+    font-size: 16px;             /* Aumenta o tamanho do texto digitado */
+    outline: none;               /* Remove aquela linha preta padrão do navegador quando clicado */
+    transition: all 0.3s ease;   /* Faz qualquer mudança (como a cor da borda) acontecer de forma suave */
+}
+
+/* Efeito de quando o usuário clica para digitar no input (Focus) */
+input:focus {
+    border-color: #667eea;       /* Muda a cor da borda para o roxo do degradê */
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.3); /* Adiciona um brilho roxo suave ao redor do input */
+}
+
+/* Estilização do botão de calcular */
+button {
+    width: 100%;                 /* Faz o botão ocupar toda a largura do card */
+    padding: 14px;               /* Deixa o botão mais "gordinho" e fácil de clicar */
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%); /* Degradê verde bem vivo */
+    color: white;                /* Cor do texto do botão */
+    border: none;                /* Remove as bordas padrão de botão do sistema */
+    border-radius: 8px;          /* Arredonda os cantos do botão */
+    font-size: 18px;             /* Deixa a letra maior */
+    font-weight: bold;           /* Deixa a letra em negrito */
+    cursor: pointer;             /* Transforma a seta do mouse na "mãozinha" de clique */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Suaviza as animações de clique e hover */
+}
+
+/* Efeito de passar o mouse por cima do botão (Hover) */
+button:hover {
+    transform: translateY(-2px); /* Desloca o botão levemente para cima (efeito de elevação) */
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4); /* Aumenta a sombra verde ao redor dele */
+}
+
+/* Efeito de quando o botão é efetivamente clicado (Active) */
+button:active {
+    transform: translateY(0);    /* Faz o botão voltar para a posição original ao clicar */
+}
+
+/* Estilização do texto do resultado que o JavaScript vai injetar */
+#resultado {
+    margin-top: 25px;            /* Espaço acima do resultado para não colar no botão */
+    font-size: 20px;             /* Tamanho do texto do resultado */
+    color: #4a5568;              /* Cor cinza azulada para o texto */
+    font-weight: 600;            /* Deixa o texto semi-negrito */
+    padding: 15px;               /* Espaçamento interno */
+    border-radius: 8px;          /* Arredonda os cantos da área de resultado */
+    background-color: #f7fafc;   /* Um fundo cinza bem clarinho para destacar o resultado */
+}

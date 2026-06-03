@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ FIFA Manager - Simulador de Futebol Profissional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a2e1c 0%, #05140a 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, gold, #ff6b00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(0,0,0,0.6);
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .tab:hover {
+            background: rgba(255,215,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, gold, #ff6b00);
+            color: #000;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Seleção de Campeonatos */
+        .championship-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .championship-card {
+            background: rgba(0,0,0,0.7);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .championship-card:hover {
+            transform: translateY(-5px);
+            border-color: gold;
+        }
+
+        .championship-card.selected {
+            border-color: gold;
+            background: rgba(255,215,0,0.2);
+        }
+
+        .championship-icon {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .championship-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Seleção de Times */
+        .teams-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .team-card {
+            background: rgba(0,0,0,0.7);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid gold;
+        }
+
+        .team-name {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .team-select {
+            width: 100%;
+            padding: 10px;
+            background: #2d2d2d;
+            border: 1px solid gold;
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        /* Formação Tática */
+        .formation-control {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .formation-select {
+            padding: 8px 15px;
+            background: #2d2d2d;
+            border: 1px solid gold;
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        /* Campo de Futebol */
+        .field {
+            background: linear-gradient(135deg, #2d5a2c 0%, #1a3a19 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            min-height: 500px;
+            border: 3px solid white;
+        }
+
+        .field::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: white;
+            transform: translateY(-50%);
+        }
+
+        .field::after {
+            content: "⚽";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            opacity: 0.3;
+        }
+
+        .positions {
+            position: relative;
+            min-height: 450px;
+        }
+
+        .player {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid gold;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8em;
+            text-align: center;
+            transform: translateX(-50%);
+        }
+
+        .player:hover {
+            transform: translateX(-50%) scale(1.1);
+            background: gold;
+            color: black;
+        }
+
+        .player-number {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .player-name {
+            font-size: 0.7em;
+        }
+
+        .player-rating {
+            font-size: 0.6em;
+            color: gold;
+        }
+
+        /* Lista de Jogadores */
+        .players-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .player-item:hover {
+            background: rgba(255,215,0,0.3);
+        }
+
+        .player-edit {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Modal de Edição */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid gold;
+        }
+
+        .modal input, .modal select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #2d2d2d;
+            border: 1px solid gold;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .simular-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, gold, #ff6b00);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .simular-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .result-area {
+            background: rgba(0,0,0,0.7);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .teams-container {
+                grid-template-columns: 1fr;
+            }
+            .player {
+                width: 50px;
+                height: 50px;
+                font-size: 0.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚽ FIFA MANAGER PRO ⚽</h1>
+        <p>Gerencie times, formações e simule campeonatos completos!</p>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('championship')">🏆 CAMPEONATOS</div>
+        <div class="tab" onclick="switchTab('teamManager')">📋 GERENCIAR TIMES</div>
+        <div class="tab" onclick="switchTab('simulator')">⚽ SIMULADOR</div>
+    </div>
+
+    <!-- Aba de Campeonatos -->
+    <div id="championship" class="tab-content active">
+        <h2>🏆 SELECIONE UM CAMPEONATO</h2>
+        <div class="championship-grid" id="championshipGrid"></div>
+        
+        <div id="championshipTeams" style="margin-top: 30px;"></div>
+        
+        <button class="simular-btn" onclick="iniciarCampeonato()">
+            🎮 INICIAR CAMPEONATO
+        </button>
+    </div>
+
+    <!-- Aba de Gerenciamento de Times -->
+    <div id="teamManager" class="tab-content">
+        <div class="teams-container">
+            <div class="team-card" id="team1Card">
+                <div class="team-header">
+                    <span class="team-name">TIME DA CASA</span>
+                    <select id="team1Select" class="team-select" onchange="carregarTime(1)"></select>
+                </div>
+                <div class="formation-control">
+                    <label>📐 Formação Tática:</label>
+                    <select id="formacao1" class="formation-select" onchange="mudarFormacao(1)">
+                        <option value="4-4-2">4-4-2 (Tradicional)</option>
+                        <option value="4-3-3">4-3-3 (Ofensivo)</option>
+                        <option value="3-5-2">3-5-2 (Meio-campo)</option>
+                        <option value="5-4-1">5-4-1 (Defensivo)</option>
+                        <option value="4-2-3-1">4-2-3-1 (Equilíbrio)</option>
+                    </select>
+                </div>
+                <div class="field" id="field1">
+                    <div class="positions" id="positions1"></div>
+                </div>
+                <div class="players-list" id="playersList1"></div>
+            </div>
+
+            <div class="team-card" id="team2Card">
+                <div class="team-header">
+                    <span class="team-name">TIME VISITANTE</span>
+                    <select id="team2Select" class="team-select" onchange="carregarTime(2)"></select>
+                </div>
+                <div class="formation-control">
+                    <label>📐 Formação Tática:</label>
+                    <select id="formacao2" class="formation-select" onchange="mudarFormacao(2)">
+                        <option value="4-4-2">4-4-2 (Tradicional)</option>
+                        <option value="4-3-3">4-3-3 (Ofensivo)</option>
+                        <option value="3-5-2">3-5-2 (Meio-campo)</option>
+                        <option value="5-4-1">5-4-1 (Defensivo)</option>
+                        <option value="4-2-3-1">4-2-3-1 (Equilíbrio)</option>
+                    </select>
+                </div>
+                <div class="field" id="field2">
+                    <div class="positions" id="positions2"></div>
+                </div>
+                <div class="players-list" id="playersList2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba de Simulador -->
+    <div id="simulator" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>⚽ SIMULAR PARTIDA</h2>
+            <div>
+                <span class="stat-badge" id="team1Stats">Time 1: 0-0-0</span>
+                <span class="stat-badge" id="team2Stats">Time 2: 0-0-0</span>
+            </div>
+        </div>
+        
+        <button class="simular-btn" onclick="simularPartida()">
+            ⚽ SIMULAR PARTIDA ⚽
+        </button>
+        
+        <div id="resultadoSimulacao" class="result-area" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- Modal de Edição de Jogador -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ Editar Jogador</h3>
+        <input type="text" id="editNome" placeholder="Nome do Jogador">
+        <select id="editPosicao">
+            <option value="GOL">Goleiro (GOL)</option>
+            <option value="ZAG">Zagueiro (ZAG)</option>
+            <option value="LAT">Lateral (LAT)</option>
+            <option value="VOL">Volante (VOL)</option>
+            <option value="MEI">Meia (MEI)</option>
+            <option value="ATA">Atacante (ATA)</option>
+        </select>
+        <input type="number" id="editOverall" min="50" max="99" placeholder="Overall (50-99)">
+        <input type="number" id="editNumero" min="1" max="99" placeholder="Número da Camisa">
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="salvarEdicao()" style="flex:1; background:#4CAF50; padding:10px; border:none; border-radius:5px; color:white; cursor:pointer;">💾 SALVAR</button>
+            <button onclick="fecharModal()" style="flex:1; background:#f44336; padding:10px; border:none; border-radius:5px; color:white; cursor:pointer;">❌ CANCELAR</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== BANCO DE DADOS ====================
+const campeonatos = {
+    "champions": { nome: "🏆 UEFA Champions League", times: 32, icone: "⭐" },
+    "libertadores": { nome: "🦅 CONMEBOL Libertadores", times: 32, icone: "🏆" },
+    "brasileirao": { nome: "🇧🇷 Brasileirão Série A", times: 20, icone: "⭐" },
+    "copa": { nome: "🌍 Copa do Mundo", times: 32, icone: "🏆" },
+    "premier": { nome: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League", times: 20, icone: "⭐" },
+    "laliga": { nome: "🇪🇸 La Liga", times: 20, icone: "⭐" }
+};
+
+const timesDB = {
+    "Brasil": { pais: "Brasil", forca: 95, tecnico: "Tite", jogadores: gerarJogadores(95) },
+    "Argentina": { pais: "Argentina", forca: 93, tecnico: "Scaloni", jogadores: gerarJogadores(93) },
+    "França": { pais: "França", forca: 92, tecnico: "Deschamps", jogadores: gerarJogadores(92) },
+    "Alemanha": { pais: "Alemanha", forca: 89, tecnico: "Flick", jogadores: gerarJogadores(89) },
+    "Inglaterra": { pais: "Inglaterra", forca: 88, tecnico: "Southgate", jogadores: gerarJogadores(88) },
+    "Portugal": { pais: "Portugal", forca: 87, tecnico: "Santos", jogadores: gerarJogadores(87) },
+    "Holanda": { pais: "Holanda", forca: 85, tecnico: "Van Gaal", jogadores: gerarJogadores(85) },
+    "Espanha": { pais: "Espanha", forca: 86, tecnico: "Luis Enrique", jogadores: gerarJogadores(86) },
+    "Itália": { pais: "Itália", forca: 84, tecnico: "Mancini", jogadores: gerarJogadores(84) },
+    "Bélgica": { pais: "Bélgica", forca: 83, tecnico: "Martinez", jogadores: gerarJogadores(83) },
+    "Flamengo": { pais: "Brasil", forca: 85, tecnico: "Dorival", jogadores: gerarJogadores(85) },
+    "Palmeiras": { pais: "Brasil", forca: 84, tecnico: "Abel", jogadores: gerarJogadores(84) },
+    "Real Madrid": { pais: "Espanha", forca: 94, tecnico: "Ancelotti", jogadores: gerarJogadores(94) },
+    "Barcelona": { pais: "Espanha", forca: 91, tecnico: "Xavi", jogadores: gerarJogadores(91) },
+    "Liverpool": { pais: "Inglaterra", forca: 90, tecnico: "Klopp", jogadores: gerarJogadores(90) },
+    "Manchester City": { pais: "Inglaterra", forca: 93, tecnico: "Guardiola", jogadores: gerarJogadores(93) },
+    "Bayern": { pais: "Alemanha", forca: 92, tecnico: "Tuchel", jogadores: gerarJogadores(92) },
+    "PSG": { pais: "França", forca: 91, tecnico: "Galtier", jogadores: gerarJogadores(91) },
+    "Milan": { pais: "Itália", forca: 86, tecnico: "Pioli", jogadores: gerarJogadores(86) },
+    "Inter": { pais: "Itália", forca: 87, tecnico: "Inzaghi", jogadores: gerarJogadores(87) }
+};
+
+function gerarJogadores(forcaTime) {
+    const nomes = ["Alisson", "Cafu", "Marcelo", "Thiago Silva", "Casemiro", "Modric", "Neymar", "Messi", "CR7", "Mbappé", 
+                   "Haaland", "De Bruyne", "Salah", "Mane", "Lewandowski", "Kimmich", "Vinicius", "Rodrygo", "Richarlison", 
+                   "Paquetá", "Fabinho", "Marquinhos", "Danilo", "Alex Sandro", "Ederson"];
+    const posicoes = ["GOL", "LAT", "LAT", "ZAG", "VOL", "MEI", "ATA", "ATA", "ATA", "ATA", "ATA", "MEI", "ATA", "ATA", 
+                      "ATA", "VOL", "ATA", "ATA", "ATA", "MEI", "VOL", "ZAG", "LAT", "LAT", "GOL"];
+    const jogadores = [];
+    
+    for (let i = 0; i < 23; i++) {
+        const variacao = Math.floor(Math.random() * 10) - 5;
+        let overall = Math.min(99, Math.max(50, forcaTime + variacao));
+        jogadores.push({
+            id: i,
+            nome: nomes[i % nomes.length] + " " + (i+1),
+            posicao: posicoes[i % posicoes.length],
+            overall: overall,
+            numero: i + 1
+        });
+    }
+    return jogadores;
+}
+
+// Posições no campo baseadas na formação
+const posicoesCampo = {
+    "4-4-2": {
+        "GOL": { top: "85%", left: "50%" },
+        "LAT": [{ top: "70%", left: "25%" }, { top: "70%", left: "75%" }],
+        "ZAG": [{ top: "75%", left: "40%" }, { top: "75%", left: "60%" }],
+        "VOL": [{ top: "55%", left: "50%" }],
+        "MEI": [{ top: "40%", left: "30%" }, { top: "40%", left: "50%" }, { top: "40%", left: "70%" }],
+        "ATA": [{ top: "15%", left: "35%" }, { top: "15%", left: "65%" }]
+    },
+    "4-3-3": {
+        "GOL": { top: "85%", left: "50%" },
+        "LAT": [{ top: "70%", left: "25%" }, { top: "70%", left: "75%" }],
+        "ZAG": [{ top: "75%", left: "40%" }, { top: "75%", left: "60%" }],
+        "MEI": [{ top: "50%", left: "30%" }, { top: "50%", left: "50%" }, { top: "50%", left: "70%" }],
+        "ATA": [{ top: "15%", left: "25%" }, { top: "10%", left: "50%" }, { top: "15%", left: "75%" }]
+    },
+    "3-5-2": {
+        "GOL": { top: "85%", left: "50%" },
+        "ZAG": [{ top: "75%", left: "25%" }, { top: "75%", left: "50%" }, { top: "75%", left: "75%" }],
+        "VOL": [{ top: "60%", left: "30%" }, { top: "60%", left: "70%" }],
+        "MEI": [{ top: "40%", left: "25%" }, { top: "40%", left: "45%" }, { top: "40%", left: "65%" }, { top: "40%", left: "85%" }],
+        "ATA": [{ top: "15%", left: "35%" }, { top: "15%", left: "65%" }]
+    },
+    "5-4-1": {
+        "GOL": { top: "85%", left: "50%" },
+        "LAT": [{ top: "70%", left: "20%" }, { top: "70%", left: "80%" }],
+        "ZAG": [{ top: "75%", left: "35%" }, { top: "75%", left: "50%" }, { top: "75%", left: "65%" }],
+        "MEI": [{ top: "50%", left: "30%" }, { top: "45%", left: "50%" }, { top: "50%", left: "70%" }],
+        "ATA": [{ top: "15%", left: "50%" }]
+    },
+    "4-2-3-1": {
+        "GOL": { top: "85%", left: "50%" },
+        "LAT": [{ top: "70%", left: "25%" }, { top: "70%", left: "75%" }],
+        "ZAG": [{ top: "75%", left: "40%" }, { top: "75%", left: "60%" }],
+        "VOL": [{ top: "60%", left: "35%" }, { top: "60%", left: "65%" }],
+        "MEI": [{ top: "40%", left: "30%" }, { top: "35%", left: "50%" }, { top: "40%", left: "70%" }],
+        "ATA": [{ top: "15%", left: "50%" }]
+    }
+};
+
+let timeSelecionado1 = "Brasil";
+let timeSelecionado2 = "Argentina";
+let currentEditTeam = null;
+let currentEditPlayer = null;
+
+// Inicialização
+function init() {
+    carregarSelectTimes();
+    carregarCampeonatos();
+    carregarTime(1);
+    carregarTime(2);
+}
+
+function carregarSelectTimes() {
+    const select1 = document.getElementById('team1Select');
+    const select2 = document.getElementById('team2Select');
+    
+    select1.innerHTML = "";
+    select2.innerHTML = "";
+    
+    Object.keys(timesDB).forEach(time => {
+        const option1 = document.createElement('option');
+        const option2 = document.createElement('option');
+        option1.value = time;
+        option1.textContent = `${time} (${timesDB[time].forca})`;
+        option2.value = time;
+        option2.textContent = `${time} (${timesDB[time].forca})`;
+        select1.appendChild(option1);
+        select2.appendChild(option2);
+    });
+    
+    select1.value = timeSelecionado1;
+    select2.value = timeSelecionado2;
+}
+
+function carregarCampeonatos() {
+    const grid = document.getElementById('championshipGrid');
+    grid.innerHTML = "";
+    
+    Object.entries(campeonatos).forEach(([key, camp]) => {
+        const card = document.createElement('div');
+        card.className = 'championship-card';
+        card.onclick = () => selecionarCampeonato(key);
+        card.innerHTML = `
+            <div class="championship-icon">${camp.icone}</div>
+            <div class="championship-name">${camp.nome}</div>
+            <div style="text-align:center;">${camp.times} times</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function selecionarCampeonato(campKey) {
+    const camp = campeonatos[campKey];
+    const container = document.getElementById('championshipTeams');
+    container.innerHTML = `
+        <h3>📋 Times participantes do ${camp.nome}</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; margin-top:15px;">
+            ${Object.keys(timesDB).slice(0, camp.times).map(time => `
+                <div style="background:rgba(255,215,0,0.2); padding:10px; border-radius:8px; text-align:center;">
+                    ⚽ ${time}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function carregarTime(teamId) {
+    const timeNome = teamId === 1 ? document.getElementById('team1Select').value : document.getElementById('team2Select').value;
+    if (teamId === 1) timeSelecionado1 = timeNome;
+    else timeSelecionado2 = timeNome;
+    
+    const time = timesDB[timeNome];
+    const formacao = document.getElementById(`formacao${teamId}`).value;
+    
+    atualizarCampo(teamId, time, formacao);
+    atualizarListaJogadores(teamId, time);
+}
+
+function atualizarCampo(teamId, time, formacao) {
+    const positionsDiv = document.getElementById(`positions${teamId}`);
+    positionsDiv.innerHTML = "";
+    
+    const config = posicoesCampo[formacao];
+    if (!config) return;
+    
+    // Agrupar jogadores por posição
+    const jogadoresPorPosicao = {};
+    time.jogadores.forEach(jogador => {
+        if (!jogadoresPorPosicao[jogador.posicao]) {
+            jogadoresPorPosicao[jogador.posicao] = [];
+        }
+        jogadoresPorPosicao[jogador.posicao].push(jogador);
+    });
+    
+    // Posicionar jogadores no campo
+    for (const [posicao, positions] of Object.entries(config)) {
+        const jogadores = jogadoresPorPosicao[posicao] || [];
+        const posArray = Array.isArray(positions) ? positions : [positions];
+        
+        for (let i = 0; i < Math.min(jogadores.length, posArray.length); i++) {
+            const jogador = jogadores[i];
+            const pos = posArray[i];
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player';
+            playerDiv.style.top = pos.top;
+            playerDiv.style.left = pos.left;
+            playerDiv.onclick = () => abrirModalEdicao(teamId, jogador);
+            playerDiv.innerHTML = `
+                <div class="player-number">${jogador.numero}</div>
+                <div class="player-name">${jogador.nome.split(' ')[0]}</div>
+                <div class="player-rating">${jogador.overall}</div>
+            `;
+            positionsDiv.appendChild(playerDiv);
+        }
+    }
+}
+
+function atualizarListaJogadores(teamId, time) {
+    const listDiv = document.getElementById(`playersList${teamId}`);
+    listDiv.innerHTML = "<h4>📋 ELENCO</h4>";
+    
+    time.jogadores.forEach(jogador => {
+        const playerItem = document.createElement('div');
+        playerItem.className = 'player-item';
+        playerItem.onclick = () => abrirModalEdicao(teamId, jogador);
+        playerItem.innerHTML = `
+            <div>
+                <strong>${jogador.numero}</strong> - ${jogador.nome} 
+                (${jogador.posicao}) - ${jogador.overall}
+            </div>
+            <button class="player-edit">✏️</button>
+        `;
+        listDiv.appendChild(playerItem);
+    });
+}
+
+function mudarFormacao(teamId) {
+    const timeNome = teamId === 1 ? document.getElementById('team1Select').value : document.getElementById('team2Select').value;
+    const time = timesDB[timeNome];
+    const formacao = document.getElementById(`formacao${teamId}`).value;
+    atualizarCampo(teamId, time, formacao);
+}
+
+function abrirModalEdicao(teamId, jogador) {
+    currentEditTeam = teamId;
+    currentEditPlayer = jogador;
+    
+    document.getElementById('editNome').value = jogador.nome;
+    document.getElementById('editPosicao').value = jogador.posicao;
+    document.getElementById('editOverall').value = jogador.overall;
+    document.getElementById('editNumero').value = jogador.numero;
+    
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function salvarEdicao() {
+    if (currentEditPlayer) {
+        currentEditPlayer.nome = document.getElementById('editNome').value;
+        currentEditPlayer.posicao = document.getElementById('editPosicao').value;
+        currentEditPlayer.overall = parseInt(document.getElementById('editOverall').value);
+        currentEditPlayer.numero = parseInt(document.getElementById('editNumero').value);
+        
+        // Recarregar o time
+        const timeNome = currentEditTeam === 1 ? document.getElementById('team1Select').value : document.getElementById('team2Select').value;
+        const time = timesDB[timeNome];
+        const formacao = document.getElementById(`formacao${currentEditTeam}`).value;
+        
+        atualizarCampo(currentEditTeam, time, formacao);
+        atualizarListaJogadores(currentEditTeam, time);
+        
+        fecharModal();
+    }
+}
+
+function fecharModal() {
+    document.getElementById('editModal').style.display = 'none';
+    currentEditPlayer = null;
+}
+
+function simularPartida() {
+    const time1 = timesDB[timeSelecionado1];
+    const time2 = timesDB[timeSelecionado2];
+    
+    // Calcular força baseada nos jogadores
+    const forca1 = time1.forca + (Math.random() * 10 - 5);
+    const forca2 = time2.forca + (Math.random() * 10 - 5);
+    
+    let gols1 = Math.floor(Math.random() * (forca1 / 20)) + Math.floor(Math.random() * 3);
+    let gols2 = Math.floor(Math.random() * (forca2 / 20)) + Math.floor(Math.random() * 3);
+    
+    // Eventos do jogo
+    const eventos = [];
+    const cartoes1 = Math.floor(Math.random() * 4);
+    const cartoes2 = Math.floor(Math.random() * 4);
+    
+    if (cartoes1 > 0) eventos.push(`🟨 ${cartoes1} cartões amarelos para ${timeSelecionado1}`);
+    if (cartoes2 > 0) eventos.push(`🟨 ${cartoes2} cartões amarelos para ${timeSelecionado2}`);
+    
+    const resultado = `
+        <div style="text-align:center;">
+            <h2>⚽ RESULTADO FINAL ⚽</h2>
+            <div style="font-size: 4em; margin: 20px;">
+                ${gols1} : ${gols2}
+            </div>
+            <div style="display: flex; justify-content: space-between; gap: 20px;">
+                <div style="flex:1; padding:20px; background:rgba(255,255,255,0.1); border-radius:15px;">
+                    <h3>${timeSelecionado1}</h3>
+                    <p>⭐ Força: ${time1.forca}</p>
+                    <p>🎯 Finalizações: ${Math.floor(Math.random() * 15) + 5}</p>
+                </div>
+                <div style="flex:1; padding:20px; background:rgba(255,255,255,0.1); border-radius:15px;">
+                    <h3>${timeSelecionado2}</h3>
+                    <p>⭐ Força: ${time2.forca}</p>
+                    <p>🎯 Finalizações: ${Math.floor(Math.random() * 15) + 5}</p>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                ${eventos.map(e => `<p>${e}</p>`).join('')}
+            </div>
+            <div style="margin-top: 20px; font-size: 1.5em;">
+                ${gols1 > gols2 ? `🏆 VENCEDOR: ${timeSelecionado1}! 🏆` : gols2 > gols1 ? `🏆 VENCEDOR: ${timeSelecionado2}! 🏆` : "🤝 EMPATE! 🤝"}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('resultadoSimulacao').innerHTML = resultado;
+    document.getElementById('resultadoSimulacao').style.display = 'block';
+    
+    // Scroll para o resultado
+    document.getElementById('resultadoSimulacao').scrollIntoView({ behavior: 'smooth' });
+}
+
+function iniciarCampeonato() {
+    alert("🏆 Campeonato iniciado! Use a aba SIMULADOR para jogar as partidas.\nOs resultados serão registrados automaticamente!");
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// Iniciar aplicação
+init();
+</script>
+</body>
+</html>

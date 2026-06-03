@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Calculadora de IMC</title>
+    
+    <link rel="stylesheet" href="stylo.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+        
+        <h1>Calculadora de IMC</h1>
+
+        <input type="number" id="peso" placeholder="Peso em kg (ex: 70.5)" step="0.1">
+        
+        <input type="number" id="altura" placeholder="Altura em metros (ex: 1.75)" step="0.01">
+        
+        <button onclick="calcularIMC()">Calcular IMC</button>
+
+        <p id="resultado"></p>
+        
+    </div>
+
+    <script>
+        // Cria a função que o botão vai chamar quando for clicado
+        function calcularIMC() {
+            
+            // Captura o que foi digitado no peso, converte para número decimal e guarda na variável 'peso'
+            let peso = parseFloat(document.getElementById('peso').value);
+            
+            // Captura o que foi digitado na altura, converte para decimal e guarda na variável 'altura'
+            let altura = parseFloat(document.getElementById('altura').value);
+
+            // Validação de segurança: se não for número (isNaN) ou se os valores forem menores ou iguais a zero...
+            if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) {
+                // ...injeta uma mensagem de alerta vermelha na tela do usuário...
+                document.getElementById('resultado').innerText = "Por favor, insira valores válidos!";
+                // ...e para a execução do código imediatamente para não fazer conta errada.
+                return; 
+            }
+
+            // Faz o cálculo do IMC: divide o peso pela altura multiplicada por ela mesma (altura ao quadrado)
+            let imc = peso / (altura * altura);
+            
+            // Cria uma variável de texto vazia que vai guardar a classificação da OMS logo abaixo
+            let classificacao = "";
+
+            // Se o IMC calculado for menor que 18.5...
+            if (imc < 18.5) { 
+                classificacao = "Abaixo do peso"; // ...guarda essa classificação.
+            } 
+            // Senão, se o IMC estiver entre 18.5 (inclusive) e menos que 25...
+            else if (imc >= 18.5 && imc < 25) { 
+                classificacao = "Peso normal (ideal)"; // ...guarda essa classificação.
+            } 
+            // Senão, se o IMC estiver entre 25 (inclusive) e menos que 30...
+            else if (imc >= 25 && imc < 30) { 
+                classificacao = "Sobrepeso"; // ...guarda essa classificação.
+            } 
+            // Senão, se o IMC estiver entre 30 (inclusive) e menos que 35...
+            else if (imc >= 30 && imc < 35) { 
+                classificacao = "Obesidade Grau I"; // ...guarda essa classificação.
+            } 
+            // Senão, se o IMC estiver entre 35 (inclusive) e menos que 40...
+            else if (imc >= 35 && imc < 40) { 
+                classificacao = "Obesidade Grau II"; // ...guarda essa classificação.
+            } 
+            // Se não entrou em nenhuma das opções de cima, o IMC com certeza é 40 ou maior...
+            else { 
+                classificacao = "Obesidade Grau III (Mórbida)"; // ...então guarda essa classificação.
+            }
+
+            // Pega o parágrafo vazio lá do HTML e joga o resultado final configurado dentro dele.
+            // O '.toFixed(2)' garante que o número do IMC só mostre 2 casas depois do ponto.
+            // O '\n' quebra uma linha para a classificação ficar embaixo do número.
+            document.getElementById('resultado').innerText = `Seu IMC é: ${imc.toFixed(2)}\n(${classificacao})`;
+        }
+    // Fecha o bloco de código JavaScript
+    </script>
+
+</body>
+</html>
